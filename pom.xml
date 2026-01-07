@@ -18,6 +18,7 @@
         <module>market-data-service</module>
         <module>alert-service</module>
         <module>notification-service</module>
+        <module>grpc-common</module>
     </modules>
     <url/>
     <licenses>

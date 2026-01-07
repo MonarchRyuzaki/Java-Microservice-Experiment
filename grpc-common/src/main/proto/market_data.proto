@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package com.shiryu21.grpc;
+
+option java_multiple_files = true;
+option java_package = "com.shiryu21.grpc";
+option java_outer_classname = "MarketDataProto";
+
+// The Service Definition
+service MarketDataService {
+  // "Hey, give me the price for this coin"
+  rpc GetCurrentPrice (PriceRequest) returns (PriceResponse);
+}
+
+// The Request Object
+message PriceRequest {
+  string symbol = 1; // e.g., "BTC"
+}
+
+// The Response Object
+message PriceResponse {
+  string symbol = 1;
+  double price = 2;
+  string timestamp = 3;
+}

@@ -4,6 +4,10 @@ import com.shiryu21.alertservice.entity.CryptoAlert;
 import com.shiryu21.alertservice.entity.User;
 import com.shiryu21.alertservice.repository.AlertRepository;
 import com.shiryu21.alertservice.repository.UserRepository;
+import com.shiryu21.grpc.MarketDataServiceGrpc;
+import com.shiryu21.grpc.PriceRequest;
+import com.shiryu21.grpc.PriceResponse;
+import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -40,6 +44,25 @@ public class AlertServiceApplication {
             userRepo.save(user);
 
             System.out.println("✅ DATA SAVED! User ID: " + user.getId());
+        };
+    }
+
+    @GrpcClient("market-data-client")
+    private MarketDataServiceGrpc.MarketDataServiceBlockingStub cryptoClient;
+
+    @Bean
+    public CommandLineRunner testGrpcCall() {
+        return args -> {
+            System.out.println("Connecting to Market Data Service");
+
+            PriceRequest request = PriceRequest.newBuilder().setSymbol("BTC").build();
+
+            try {
+                PriceResponse response = cryptoClient.getCurrentPrice(request);
+                System.out.println(response);
+            } catch (Exception e) {
+                System.err.println("❌ RPC FAILED: " + e.getMessage());
+            }
         };
     }
 }

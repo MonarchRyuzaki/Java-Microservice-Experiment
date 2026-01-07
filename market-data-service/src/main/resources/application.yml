@@ -3,3 +3,7 @@ server:
 spring:
   application:
     name: market-data-service
+
+grpc:
+  server:
+    port: 9090

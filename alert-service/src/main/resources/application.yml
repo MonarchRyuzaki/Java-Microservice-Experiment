@@ -11,3 +11,8 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+grpc:
+  client:
+    market-data-client:
+      address: static://localhost:9090
+      negotiation-type: plaintext
