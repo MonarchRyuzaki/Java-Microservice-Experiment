@@ -11,6 +11,17 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+  cloud:
+    function:
+      definition: checkAlerts
+    stream:
+      bindings:
+        checkAlerts-in-0:
+          destination: crypto-prices
+          group: alert-service-group
+      kafka:
+        binder:
+          brokers: localhost:9092
 grpc:
   client:
     market-data-client:

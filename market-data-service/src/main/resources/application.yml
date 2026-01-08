@@ -3,6 +3,16 @@ server:
 spring:
   application:
     name: market-data-service
+  cloud:
+    function:
+      definition: supplyPrice
+    stream:
+      bindings:
+        supplyPrice-out-0:
+          destination: crypto-prices
+      kafka:
+        binder:
+          brokers: localhost:9092
 
 grpc:
   server:
