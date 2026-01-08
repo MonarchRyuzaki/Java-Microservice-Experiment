@@ -3,3 +3,14 @@ server:
 spring:
   application:
     name: notification-service
+  cloud:
+    function:
+      definition: sendEmail
+    stream:
+      bindings:
+        sendEmail-in-0:
+          destination: notification-topic
+          group: notification-group
+      kafka:
+        binder:
+          brokers: localhost:9092

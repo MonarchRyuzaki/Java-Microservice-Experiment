@@ -1,8 +1,10 @@
 package com.shiryu21.alertservice.service;
 
+import com.shiryu21.alertservice.dto.NotificationEvent;
 import com.shiryu21.alertservice.dto.PriceUpdate;
 import com.shiryu21.alertservice.entity.CryptoAlert;
 import com.shiryu21.alertservice.repository.AlertRepository;
+import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -13,9 +15,11 @@ import java.util.function.Consumer;
 public class AlertConsumer {
 
     private final AlertRepository alertRepository;
+    private final StreamBridge streamBridge;
 
-    public AlertConsumer(AlertRepository alertRepository) {
+    public AlertConsumer(AlertRepository alertRepository, StreamBridge streamBridge) {
         this.alertRepository = alertRepository;
+        this.streamBridge = streamBridge;
     }
 
     @Bean
@@ -32,6 +36,11 @@ public class AlertConsumer {
                     System.out.println("🚨 ALERT TRIGGERED! User: " + alert.getUser().getEmail() +
                             " | Target: " + alert.getTargetPrice());
                     // Later: Send to Notification Service
+
+                    NotificationEvent event = new NotificationEvent(alert.getUser().getEmail(), alert.getSymbol(), priceUpdate.price(), alert.getCondition());
+
+                    streamBridge.send("notification-topic", event);
+                    System.out.println("🚨 ALERT SENT TO KAFKA for: " + alert.getUser().getEmail());
                 }
             });
         };
