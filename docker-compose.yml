@@ -11,6 +11,11 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U admin -d coin_db" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   zookeeper:
     image: confluentinc/cp-zookeeper:7.5.0
     container_name: coin_zookeeper
@@ -36,5 +41,48 @@ services:
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    healthcheck:
+      test: nc -z localhost 9092 || exit -1
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  market-data:
+    build: ./market-data-service
+    container_name: coin_market
+    depends_on:
+      kafka:
+        condition: service_healthy
+    environment:
+      # Override Kafka URL to point to the container 'kafka' on internal port 29092
+      SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS: kafka:29092
+      SERVER_PORT: 8081
+      GRPC_SERVER_PORT: 9090
+
+  alert-service:
+    build: ./alert-service
+    container_name: coin_alert
+    depends_on:
+      postgres:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+      market-data:
+        condition: service_started
+    environment:
+      # Override DB URL to point to 'postgres' container
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/coin_db
+      SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS: kafka:29092
+      # Override gRPC client to point to 'market-data' container
+      GRPC_CLIENT_MARKET_DATA_CLIENT_ADDRESS: static://market-data:9090
+
+  notification-service:
+    build: ./notification-service
+    container_name: coin_notification
+    depends_on:
+      kafka:
+        condition: service_healthy
+    environment:
+      SPRING_CLOUD_STREAM_KAFKA_BINDER_BROKERS: kafka:29092
 volumes:
   postgres_data:
