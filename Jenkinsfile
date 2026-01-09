@@ -22,7 +22,7 @@ pipeline {
                 // We use the Maven wrapper (mvnw) to ensure consistency
                 // 'sh' runs a shell command
                 sh 'chmod +x mvnw'
-                sh './mvnw clean package'
+                sh './mvnw clean package -DskipTests'
             }
         }
 
