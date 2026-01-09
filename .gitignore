@@ -31,3 +31,17 @@ build/
 
 ### VS Code ###
 .vscode/
+
+
+# .gitignore
+
+# Local .terraform directories
+**/.terraform/*
+
+# .tfstate files (Contains secrets! NEVER commit these)
+*.tfstate
+*.tfstate.*
+
+# Crash log files
+crash.log
+override.tf
