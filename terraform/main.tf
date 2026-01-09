@@ -55,6 +55,11 @@ resource "docker_container" "jenkins_server" {
     container_path = "/var/run/docker.sock"
   }
 
+  volumes {
+    host_path      = "/usr/bin/docker"
+    container_path = "/usr/bin/docker"
+  }
+
   # Allow Jenkins to read the socket (User 0 is root - insecure but necessary for local Docker-in-Docker)
   user = "root"
 }
