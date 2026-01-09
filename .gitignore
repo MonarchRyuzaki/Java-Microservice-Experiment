@@ -36,12 +36,27 @@ build/
 # .gitignore
 
 # Local .terraform directories
-**/.terraform/*
+.terraform/
 
-# .tfstate files (Contains secrets! NEVER commit these)
-terraform.tfstate
-terraform.tfstate.backup
+# State files and backups
+*.tfstate
+*.tfstate.*
 
 # Crash log files
 crash.log
+crash.*.log
+
+# Exclude all .tfvars files, which are likely to contain sensitive data
+# (consider using a different file name if you want to commit specific variable files)
+*.tfvars
+*.tfvars.json
+
+# Ignore override files as they are usually used for local overrides
 override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Ignore CLI configuration files
+.terraformrc
+terraform.rc
